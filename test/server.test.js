@@ -604,15 +604,15 @@ test("annotation card keeps the selected element highlighted while open", () => 
   assert.match(js, /if \(hovered && hovered !== selected\)/);
 });
 
-test("artifact SDK can annotate selected text ranges with stable anchors", () => {
+test("artifact SDK leaves text selection to the browser instead of annotating it", () => {
   const js = createSdkJs("abc");
 
-  assert.match(js, /document\.getSelection\(\)/);
-  assert.match(js, /function textSelectionContext/);
-  assert.match(js, /type:\s*["']text-range["']/);
-  assert.match(js, /start:\s*rangeBoundary\(range\.startContainer, range\.startOffset\)/);
-  assert.match(js, /end:\s*rangeBoundary\(range\.endContainer, range\.endOffset\)/);
-  assert.match(js, /commonAncestorSelector/);
+  // Opening a card on mouseup stole focus and cleared the selection, so Cmd/Ctrl+C copied nothing.
+  assert.doesNotMatch(js, /"mouseup"/);
+  assert.doesNotMatch(js, /type:\s*["']text-range["']/);
+  assert.doesNotMatch(js, /function textSelectionContext/);
+  assert.doesNotMatch(js, /Annotate text/);
+  assert.match(js, /if \(endsTextDrag\(event\)\) return;\s*showAnnotationCard\(event\.target\)/);
 });
 
 test("annotation hover remains active while another element is selected", () => {
@@ -732,12 +732,6 @@ test("artifact SDK lets disclosure controls handle their own clicks", () => {
   assert.match(js, /isInteractiveControl\(event\.target\)/);
   assert.doesNotMatch(clickHandler, /isDirectDetailsElement\(event\.target\)/);
   assert.doesNotMatch(js, /function isDirectDetailsElement/);
-});
-
-test("artifact SDK does not annotate text selected inside native controls", () => {
-  const js = createSdkJs("abc");
-
-  assert.match(js, /isInteractiveControl\(ancestor\)/);
 });
 
 test("artifact SDK shows native cursors on form controls in annotation mode", () => {
