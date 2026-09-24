@@ -604,16 +604,8 @@ test("annotation card keeps the selected element highlighted while open", () => 
   assert.match(js, /if \(hovered && hovered !== selected\)/);
 });
 
-test("artifact SDK leaves text selection to the browser instead of annotating it", () => {
-  const js = createSdkJs("abc");
-
-  // Opening a card on mouseup stole focus and cleared the selection, so Cmd/Ctrl+C copied nothing.
-  assert.doesNotMatch(js, /"mouseup"/);
-  assert.doesNotMatch(js, /type:\s*["']text-range["']/);
-  assert.doesNotMatch(js, /function textSelectionContext/);
-  assert.doesNotMatch(js, /Annotate text/);
-  assert.match(js, /if \(endsTextDrag\(event\)\) return;\s*showAnnotationCard\(event\.target\)/);
-});
+// "Selecting text is left to the browser" is a behaviour, so it is covered by driving the served
+// bundle's own listeners in test/artifact-sdk-bundle.test.js, not by grepping this bundle's text.
 
 test("annotation hover remains active while another element is selected", () => {
   const js = createSdkJs("abc");
