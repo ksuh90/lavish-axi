@@ -219,7 +219,7 @@ pnpm link
   A plain `lavish-axi <html-file>` after a user-initiated end refuses to reopen the browser and returns guidance instead; pass `--reopen` only when the user asks for further review or something important needs their visual attention.
   Agent-initiated ends keep reopening normally, same as before.
   `lavish-axi poll`'s `ended` response and the `feedback` response for the final batch before an end both carry `next_step` guidance telling the agent to stop polling and deliver remaining updates in chat instead of reopening.
-- **Precise targets** - A click annotates the element under the cursor. Selecting text is left to the browser and never opens an annotation card, so a selection stays copyable with Cmd+C or Ctrl+C.
+- **Precise targets** - A click annotates the element under the cursor. Selecting text is left to the browser, and a click that ends a drag-select does not open an annotation card, so a drag-selection stays copyable with Cmd+C or Ctrl+C.
   Clicking an element inside a table also carries the cell's visible row and column names alongside the exact CSS locator, so filtered or sorted rows do not make feedback look misdirected.
   When merged cells make either name ambiguous, Lavish leaves that name out rather than guessing; an explicit `<th scope="row">` remains authoritative even when a `rowspan` makes the row's position ambiguous.
   The CSS locator still points at the exact element you clicked, so an annotation with an omitted name is only less descriptive, never mislabelled.

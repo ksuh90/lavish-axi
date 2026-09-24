@@ -192,10 +192,10 @@ function bootSdk({ runAnimationFrames = false, revisionsScript = null, revisionM
     // The press point the click guard measures against comes from a real mousedown, so a test that
     // cares about pointer movement has to deliver one; clicks that do not carry coordinates leave
     // the guard with nothing to measure, exactly as an unmoved click does.
-    mousedown(target, { clientX = 0, clientY = 0, button = 0 } = {}) {
+    mousedown(target, { clientX = 0, clientY = 0 } = {}) {
       const listener = documentListeners.find((entry) => entry.type === "mousedown");
       assert.ok(listener, "the SDK registers a document mousedown listener");
-      listener.handler({ target, button, clientX, clientY });
+      listener.handler({ target, button: 0, clientX, clientY });
     },
     click(target, { clientX = 0, clientY = 0 } = {}) {
       const listener = documentListeners.find((entry) => entry.type === "click");
@@ -203,7 +203,7 @@ function bootSdk({ runAnimationFrames = false, revisionsScript = null, revisionM
       listener.handler({ target, clientX, clientY, preventDefault() {}, stopPropagation() {} });
     },
     setDocumentSelection(text) {
-      documentSelection = text === null ? null : { toString: () => text };
+      documentSelection = { toString: () => text };
     },
     setDocumentQuery(query) {
       documentQuery = query;
