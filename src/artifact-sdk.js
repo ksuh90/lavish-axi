@@ -2471,7 +2471,7 @@ export function createArtifactSdk(
   document.addEventListener(
     "mousedown",
     (event) => {
-      pressPoint = { x: event.clientX, y: event.clientY };
+      pressPoint = event.button === 0 ? { x: event.clientX, y: event.clientY } : null;
     },
     true,
   );

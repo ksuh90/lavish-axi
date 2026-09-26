@@ -192,10 +192,10 @@ function bootSdk({ runAnimationFrames = false, revisionsScript = null, revisionM
     // The press point the click guard measures against comes from a real mousedown, so a test that
     // cares about pointer movement has to deliver one; clicks that do not carry coordinates leave
     // the guard with nothing to measure, exactly as an unmoved click does.
-    mousedown(target, { clientX = 0, clientY = 0 } = {}) {
+    mousedown(target, { clientX = 0, clientY = 0, button = 0 } = {}) {
       const listener = documentListeners.find((entry) => entry.type === "mousedown");
       assert.ok(listener, "the SDK registers a document mousedown listener");
-      listener.handler({ target, button: 0, clientX, clientY });
+      listener.handler({ target, button, clientX, clientY });
     },
     click(target, { clientX = 0, clientY = 0 } = {}) {
       const listener = documentListeners.find((entry) => entry.type === "click");
@@ -425,6 +425,25 @@ test("the served SDK bundle annotates a click with no fresh mousedown after a dr
   sdk.click(paragraph, { clientX: 220, clientY: 60 });
   assert.deepEqual(sdk.cards(), [], "the drag-select click is the suppressed one");
 
+  sdk.click(paragraph, { clientX: 400, clientY: 60 });
+
+  const message = sdk.queue("Reword this");
+  assert.equal(message.prompt.tag, "p");
+});
+
+// A non-primary press never produces a click (it produces auxclick), so nothing would consume its
+// press point. It has to clear the press point instead, or the next mousedown-less click measures
+// against a press the reviewer only made to open the context menu.
+test("the served SDK bundle annotates a mousedown-less click after a non-primary press", () => {
+  const sdk = bootSdk();
+  const paragraph = appendTo(sdk.body, cell("p", "The quick brown fox jumps over the lazy dog."));
+
+  sdk.mousedown(paragraph, { clientX: 40, clientY: 60 });
+  sdk.setDocumentSelection("quick brown fox");
+  sdk.click(paragraph, { clientX: 220, clientY: 60 });
+  assert.deepEqual(sdk.cards(), [], "the drag-select click is the suppressed one");
+
+  sdk.mousedown(paragraph, { clientX: 220, clientY: 60, button: 2 });
   sdk.click(paragraph, { clientX: 400, clientY: 60 });
 
   const message = sdk.queue("Reword this");
