@@ -2471,7 +2471,7 @@ export function createArtifactSdk(
   document.addEventListener(
     "mousedown",
     (event) => {
-      pressPoint = event.button === 0 ? { x: event.clientX, y: event.clientY } : null;
+      pressPoint = { x: event.clientX, y: event.clientY };
     },
     true,
   );
@@ -2479,8 +2479,10 @@ export function createArtifactSdk(
   // "Text is selected" alone is not enough: a click inside an existing selection keeps it until
   // after the click and must still annotate, so the pointer has to have moved as well.
   function endsTextDrag(event) {
-    if (!pressPoint) return false;
-    const moved = Math.hypot(event.clientX - pressPoint.x, event.clientY - pressPoint.y) >= TEXT_DRAG_MIN_PX;
+    const point = pressPoint;
+    pressPoint = null;
+    if (!point) return false;
+    const moved = Math.hypot(event.clientX - point.x, event.clientY - point.y) >= TEXT_DRAG_MIN_PX;
     return moved && !!String(document.getSelection() || "").trim();
   }
 

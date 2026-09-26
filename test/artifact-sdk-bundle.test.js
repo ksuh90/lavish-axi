@@ -413,6 +413,24 @@ test("the served SDK bundle does not annotate a click that ends a drag-select", 
   assert.deepEqual(sdk.cards(), [], "a click that ends a drag-select must leave the selection alone");
 });
 
+// An artifact that calls preventDefault() on pointerdown suppresses the compatibility mousedown
+// while Chrome still fires click and keeps the standing selection, so the next click carries no
+// fresh press point. It must annotate rather than measure against the previous press.
+test("the served SDK bundle annotates a click with no fresh mousedown after a drag-select", () => {
+  const sdk = bootSdk();
+  const paragraph = appendTo(sdk.body, cell("p", "The quick brown fox jumps over the lazy dog."));
+
+  sdk.mousedown(paragraph, { clientX: 40, clientY: 60 });
+  sdk.setDocumentSelection("quick brown fox");
+  sdk.click(paragraph, { clientX: 220, clientY: 60 });
+  assert.deepEqual(sdk.cards(), [], "the drag-select click is the suppressed one");
+
+  sdk.click(paragraph, { clientX: 400, clientY: 60 });
+
+  const message = sdk.queue("Reword this");
+  assert.equal(message.prompt.tag, "p");
+});
+
 test("the served SDK bundle annotates a click that did not move, even inside an existing selection", () => {
   const sdk = bootSdk();
   const paragraph = appendTo(sdk.body, cell("p", "The quick brown fox jumps over the lazy dog."));
